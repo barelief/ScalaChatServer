@@ -107,8 +107,21 @@ object ClaudeChatServer:
       val incoming = Flow[Message]
         .collect { case TextMessage.Strict(text) =>
           val json = Json.parse(text)
-          (json \ "content").as[String]
+
+          // Try to extract "content" field safely
+          (json \ "content").asOpt[String] match {
+            case Some(content) =>
+              println(s"Incoming message from $name: $content")
+              content
+            case None =>
+              // Log if "content" field is missing
+              println(
+                s"Incoming message from $name does not have 'content' field: $json"
+              )
+              ""
+          }
         }
+        .filter(_.nonEmpty) // Filter out empty messages if content is missing
         .map(content => ChatRoomCommand.Message(name, content))
         .to(Sink.foreach[ChatRoomCommand](chatRoomActor ! _))
 
