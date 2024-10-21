@@ -6,6 +6,7 @@ A real-time chat application with a **Scala backend** and **HTML/JavaScript fron
 
 - Real-time messaging with WebSockets.
 - Connected members display.
+- Display join messages
 - Simple login by username.
 
 ## Project Structure
@@ -13,7 +14,14 @@ A real-time chat application with a **Scala backend** and **HTML/JavaScript fron
 - **Frontend**: 
   - `index.html`: HTML/CSS/JavaScript for the chat interface. Connects to the WebSocket server.
 - **Backend**: 
-  - `ClaudeChatServer.scala`: Scala-based WebSocket server to handle connections and broadcast messages.
+  - `ChatServer.scala`: Scala-based WebSocket server to handle connections and broadcast messages.
+
+## Server
+
+1. `ChatServer.scala`: Contains the main entry point and server setup.
+2. `ChatRoomActor.scala`: Defines the chat room actor and its messages.
+3. `WebSocketFlow.scala`: Handles the WebSocket flow and message passing.
+4. `JsonMessageAdapter.scala`: Manages JSON serialization and deserialization.
 
 ## Requirements
 
