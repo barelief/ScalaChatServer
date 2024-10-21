@@ -14,6 +14,7 @@ lazy val root = project
       "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
       "com.typesafe.akka" %% "akka-stream-typed" % akkaVersion,
       "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
+      "ch.qos.logback" % "logback-classic" % "1.2.3",
       "com.typesafe.play" %% "play-json" % "2.10.3",
       "ch.qos.logback" % "logback-classic" % "1.4.7",
       "org.scalameta" %% "munit" % "1.0.0" % Test

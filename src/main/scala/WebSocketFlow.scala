@@ -8,8 +8,7 @@ import play.api.libs.json._
 
 import scala.concurrent.{ExecutionContext, Promise}
 
-
-object WebSocketFlow {
+object WebSocketFlow extends Logging {
   def create(name: String, chatRoom: ActorRef[ChatRoomActor.Command])
             (implicit system: ActorSystem[_], ec: ExecutionContext): Flow[Message, Message, Any] = {
     val (queue, publisher) = Source
@@ -26,6 +25,7 @@ object WebSocketFlow {
     responsePromise.success(actorRef)
 
     val outgoingMessages = Source.futureSource(responsePromise.future.map { actorRef =>
+      // logger.info(s"User $name connected")
       chatRoom ! ChatRoomActor.Join(name, actorRef)
       publisher
     })
@@ -35,6 +35,7 @@ object WebSocketFlow {
       .collect {
         case json if (json \ "content").asOpt[String].isDefined =>
           val content = (json \ "content").as[String]
+          // logger.info(s"Incoming message from $name: $content")
           ChatRoomActor.Message(name, content)
       }
       .to(Sink.foreach[ChatRoomActor.Command](chatRoom ! _))

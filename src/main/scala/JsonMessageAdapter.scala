@@ -1,32 +1,28 @@
 package bare.chatserver
 
-import akka.actor.typed.{ActorSystem, Behavior}
+import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.scaladsl.SourceQueueWithComplete
 import akka.stream.QueueOfferResult
 import play.api.libs.json._
 import scala.concurrent.ExecutionContext
 
-object JsonMessageAdapter {
-
-  // Modified behavior method that takes an implicit ExecutionContext
+object JsonMessageAdapter extends Logging {
   def behavior(queue: SourceQueueWithComplete[ChatRoomActor.Response])(implicit
       ec: ExecutionContext
   ): Behavior[ChatRoomActor.Response] =
     Behaviors.receiveMessage { msg =>
-      queue
-        .offer(msg)
-        .foreach {
-          case QueueOfferResult.Enqueued    => ()
-          case QueueOfferResult.Dropped     => println(s"Dropped message: $msg")
-          case QueueOfferResult.Failure(ex) => println(s"Enqueue failed: $ex")
-          case QueueOfferResult.QueueClosed =>
-            println("Queue was closed (pool shut down)")
-        }(ec) // Explicitly pass the ExecutionContext here
+      queue.offer(msg).foreach {
+        case QueueOfferResult.Enqueued => ()
+        case QueueOfferResult.Dropped  => logger.warn(s"Dropped message: $msg")
+        case QueueOfferResult.Failure(ex) =>
+          logger.error(s"Enqueue failed: $ex", ex)
+        case QueueOfferResult.QueueClosed =>
+          logger.info("Queue was closed (pool shut down)")
+      }
       Behaviors.same
     }
 
-  // Converts responses to JSON format
   def responseToJson(response: ChatRoomActor.Response): JsValue =
     response match {
       case ChatRoomActor.Joined(name, members) =>
@@ -39,7 +35,6 @@ object JsonMessageAdapter {
         Json.obj("sender" -> sender, "content" -> content)
     }
 
-  // Implicit JSON formats for converting case classes to JSON
   implicit val chatMessageFormat: Format[ChatRoomActor.ChatMessage] =
     Json.format[ChatRoomActor.ChatMessage]
   implicit val messageReceivedFormat: Format[ChatRoomActor.MessageReceived] =
