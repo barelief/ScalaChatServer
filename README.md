@@ -2,6 +2,8 @@
 
 A real-time chat application with a **Scala backend** and **HTML/JavaScript frontend**. Users can join a chat room, send messages, and view connected members.
 
+![Screenshot_1](https://github.com/user-attachments/assets/72e1228f-7bf1-4864-a50b-34334e828e77)
+
 ## Features
 
 - Real-time messaging with WebSockets.
