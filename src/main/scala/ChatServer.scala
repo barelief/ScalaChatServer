@@ -17,10 +17,12 @@ object ClaudeChatServer:
     case Join(name: String, replyTo: ActorRef[Response])
     case Leave(name: String)
     case Message(sender: String, content: String)
+    case GetMembers(replyTo: ActorRef[Response])
 
   // ADT for Response messages
   enum Response:
-    case Joined(members: Set[String])
+    case Joined(name: String, members: Set[String])
+    case MembersList(members: Set[String])
     case MessageReceived(message: ChatMessage)
 
   // Case class for chat messages
@@ -29,6 +31,8 @@ object ClaudeChatServer:
   // JSON formats
   given Format[ChatMessage] = Json.format[ChatMessage]
   given Format[Response.MessageReceived] = Json.format[Response.MessageReceived]
+  given Format[Response.MembersList] = Json.format[Response.MembersList]
+  given Format[Response.Joined] = Json.format[Response.Joined]
 
   // ChatRoom actor behavior (manages users and broadcast messages)
   def chatRoom(): Behavior[ChatRoomCommand] =
@@ -41,18 +45,25 @@ object ClaudeChatServer:
     ): Behavior[ChatRoomCommand] =
       // Behavior when receiving a chat room command
       Behaviors.receiveMessage {
+
         case ChatRoomCommand.Join(name, replyTo) =>
-          subscribers.foreach(
-            _ ! Response.Joined(members + name)
-          )
-          updated(members + name, subscribers + replyTo)
+          val updatedMembers = members + name
+          subscribers.foreach(_ ! Response.Joined(name, updatedMembers))
+          replyTo ! Response.MembersList(updatedMembers)
+          updated(updatedMembers, subscribers + replyTo)
 
         case ChatRoomCommand.Leave(name) =>
-          updated(members - name, subscribers)
+          val updatedMembers = members - name
+          subscribers.foreach(_ ! Response.MembersList(updatedMembers))
+          updated(updatedMembers, subscribers)
 
         case ChatRoomCommand.Message(sender, content) =>
           val message = Response.MessageReceived(ChatMessage(sender, content))
           subscribers.foreach(_ ! message)
+          Behaviors.same
+
+        case ChatRoomCommand.GetMembers(replyTo) =>
+          replyTo ! Response.MembersList(members)
           Behaviors.same
       }
 
@@ -107,28 +118,38 @@ object ClaudeChatServer:
       val incoming = Flow[Message]
         .collect { case TextMessage.Strict(text) =>
           val json = Json.parse(text)
-
-          // Try to extract "content" field safely
-          (json \ "content").asOpt[String] match {
-            case Some(content) =>
-              println(s"Incoming message from $name: $content")
-              content
-            case None =>
-              // Log if "content" field is missing
-              println(
-                s"Incoming message from $name does not have 'content' field: $json"
-              )
-              ""
+          (json \ "type").asOpt[String] match {
+            case Some("getMembers") =>
+              ChatRoomCommand.GetMembers(actorRef)
+            case _ =>
+              (json \ "content").asOpt[String] match {
+                case Some(content) =>
+                  println(s"Incoming message from $name: $content")
+                  ChatRoomCommand.Message(name, content)
+                case None =>
+                  println(
+                    s"Incoming message from $name does not have 'content' field: $json"
+                  )
+                  ChatRoomCommand.Message(name, "")
+              }
           }
         }
-        .filter(_.nonEmpty) // Filter out empty messages if content is missing
-        .map(content => ChatRoomCommand.Message(name, content))
         .to(Sink.foreach[ChatRoomCommand](chatRoomActor ! _))
 
       // Outgoing flow for sending chat updates back to the client
       val outgoing = outgoingMessages
         .map {
-          case Response.Joined(members) =>
+          case Response.Joined(joinedName, members) =>
+            TextMessage(
+              Json
+                .obj(
+                  "type" -> "joined",
+                  "name" -> joinedName,
+                  "members" -> members
+                )
+                .toString
+            )
+          case Response.MembersList(members) =>
             TextMessage(
               Json.obj("type" -> "members", "members" -> members).toString
             )
