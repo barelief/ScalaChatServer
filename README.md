@@ -18,8 +18,7 @@ This is a real-time chat application using a Scala backend and a Vue.js-based fr
     - `ChatRoom.vue`: Core chat room UI.
     - `LoginForm.vue`: Handles user login input.
   - **Pages**:
-    - `ChatRoom.vue`: The main chat room page.
-    - `IndexPage.vue`: The login page, which leads to the chat room.
+    - `IndexPage.vue`: The main page, which leads from login to the chat room.
   - **Layouts**:
     - `MainLayout.vue`: Layout used across the app.
   - **Services**:
