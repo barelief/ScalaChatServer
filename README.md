@@ -2,6 +2,8 @@
 
 This is a real-time chat application using a Scala backend and a Vue.js-based frontend with the Quasar Framework, organized as a monorepo. Users can join chat rooms, send messages, and view connected members in real-time.
 
+![Screenshot (73)](https://github.com/user-attachments/assets/a44a5391-f9a3-464e-9156-2c87a34e0418)
+
 ## Features
 
 - Real-time messaging using WebSockets.
