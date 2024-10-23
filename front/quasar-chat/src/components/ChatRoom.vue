@@ -7,7 +7,7 @@
             v-for="(message, index) in props.messages"
             :key="index"
             :text="[message.content]"
-            :name="message.sender"
+            :name="message.sender === props.userName ? 'Me' : message.sender"
             :sent="message.sender === props.userName"
           />
         </q-card-section>
