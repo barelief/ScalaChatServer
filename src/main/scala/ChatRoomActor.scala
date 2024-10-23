@@ -2,11 +2,11 @@ package bare.chatserver
 
 import akka.actor.typed.{ActorRef, Behavior}
 import akka.actor.typed.scaladsl.Behaviors
+import bare.chatserver.SaveDataModule
 
 object ChatRoomActor {
   sealed trait Command
-  final case class Join(name: String, replyTo: ActorRef[Response])
-      extends Command
+  final case class Join(name: String, replyTo: ActorRef[Response]) extends Command
   final case class Leave(name: String) extends Command
   final case class Message(sender: String, content: String) extends Command
   final case class GetMembers(replyTo: ActorRef[Response]) extends Command
@@ -19,8 +19,7 @@ object ChatRoomActor {
   case class ChatMessage(sender: String, content: String)
 
   def behavior(): Behavior[Command] = Behaviors.setup { context =>
-    val log = Logging(context.system)
-
+    val log = context.log    
     def updated(
         members: Set[String],
         subscribers: Set[ActorRef[Response]]
@@ -41,6 +40,10 @@ object ChatRoomActor {
 
         case Message(sender, content) =>
           log.info(s"$sender: $content")
+          
+          // Save message to the database
+          SaveDataModule.saveData(sender, content)
+          
           val message = MessageReceived(ChatMessage(sender, content))
           subscribers.foreach(_ ! message)
           Behaviors.same

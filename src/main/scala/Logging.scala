@@ -9,5 +9,5 @@ trait Logging {
 }
 
 object Logging {
-  def apply(system: ActorSystem[_]): Logger = system.log
+  def apply(system: ActorSystem[?]): Logger = system.log
 }

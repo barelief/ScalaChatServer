@@ -18,5 +18,9 @@ lazy val root = project
       "com.typesafe.play" %% "play-json" % "2.10.3",
       "ch.qos.logback" % "logback-classic" % "1.4.7",
       "org.scalameta" %% "munit" % "1.0.0" % Test
+    ),
+    libraryDependencies ++= Seq(
+      "org.postgresql" % "postgresql" % "42.2.20",
     )
+
   )

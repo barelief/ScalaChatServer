@@ -10,7 +10,7 @@ import scala.concurrent.{ExecutionContext, Promise}
 
 object WebSocketFlow extends Logging {
   def create(name: String, chatRoom: ActorRef[ChatRoomActor.Command])
-            (implicit system: ActorSystem[_], ec: ExecutionContext): Flow[Message, Message, Any] = {
+            (implicit system: ActorSystem[?], ec: ExecutionContext): Flow[Message, Message, Any] = {
     val (queue, publisher) = Source
       .queue[ChatRoomActor.Response](bufferSize = 100, OverflowStrategy.dropHead)
       .preMaterialize()
