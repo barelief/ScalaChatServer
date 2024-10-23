@@ -70,12 +70,14 @@ Clone the repository.
 
 ### **Frontend**
 
+- [ ] Write Comments!
 - [ ] Fix buggy member list slider on desktop.
 - [ ] Automatically scroll to the bottom of the `chatmessages` area when new messages arrive.
 - [ ] Add auto-reconnect functionality for WebSockets after idle.
 
 ### **Backend**
 
+- [ ] Write Comments!
 - [ ] Implement message persistence with a database.
 - [ ] Add user authentication.
 - [ ] Resolve duplicate user error on login.
