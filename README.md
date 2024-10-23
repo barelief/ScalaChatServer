@@ -1,8 +1,8 @@
 # Chat Client with Scala Backend
 
-This is a real-time chat application using a Scala backend and a Vue.js-based frontend with the Quasar Framework, organized as a monorepo. Users can join chat rooms, send messages, and view connected members in real-time.
+This is a real-time chat application using a Scala backend and a Vue.js-based frontend with the Quasar Framework, organized as a monorepo. Users can join chat rooms, send messages, and view connected members in real-time. Messages are stored into database.
 
-![Screenshot (73)](https://github.com/user-attachments/assets/a44a5391-f9a3-464e-9156-2c87a34e0418)
+![Scala_Quasar_Postgres](https://github.com/user-attachments/assets/3f5a2da3-8696-4719-953a-4ba2df36d6dd)
 
 ## Features
 
@@ -10,6 +10,7 @@ This is a real-time chat application using a Scala backend and a Vue.js-based fr
 - Connected members display with live updates.
 - Display of join and leave messages.
 - Simple username-based login.
+- Messages are stored into database
 
 ### **Frontend (Quasar-based Vue.js)**
 
@@ -35,6 +36,7 @@ This is a real-time chat application using a Scala backend and a Vue.js-based fr
   - **WebSocketFlow.scala**: Handles WebSocket flows for message routing.
   - **JsonMessageAdapter.scala**: Manages JSON serialization and deserialization for WebSocket communication.
   - **Logging.scala**: Handles logging for the backend using Logback.
+  - **SaveDataModule.scala**: Saves chat messages to Postgres
 
 ### **Other Files**
 
@@ -42,6 +44,7 @@ This is a real-time chat application using a Scala backend and a Vue.js-based fr
   - `public/index.html`: Entry point for the frontend, working js prototype.
 - **Backend**:
   - `resources/logback.xml`: Configuration for logging, using Logback.
+  - `resources/application.conf`: database config
 
 ## Requirements
 
@@ -62,9 +65,19 @@ Clone the repository.
 
 ### **Backend Setup**
 
-1. Navigate to the root repo folder
-2. Run the Scala backend server using `sbt run`.
-3. The WebSocket server will be accessible at `ws://localhost:8080/ws-chat/`.
+1. Install postgres. Create db `chatdb`. Run this query:
+```sql
+CREATE TABLE messages (
+  id SERIAL PRIMARY KEY,
+  sender VARCHAR(255) NOT NULL,
+  message TEXT NOT NULL,
+  timestamp BIGINT NOT NULL
+);
+```
+2. Navigate to the root repo folder
+3. Run the Scala backend server using `sbt run`.
+4. The WebSocket server will be accessible at `ws://localhost:8080/ws-chat/`.
+
 
 ## TODO
 
@@ -78,6 +91,6 @@ Clone the repository.
 ### **Backend**
 
 - [ ] Write Comments!
-- [ ] Implement message persistence with a database.
+- [x] Implement message persistence with a database.
 - [ ] Add user authentication.
 - [ ] Resolve duplicate user error on login.
