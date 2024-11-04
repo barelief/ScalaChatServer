@@ -6,20 +6,11 @@
       </q-card-section>
 
       <q-card-section>
-        <q-input
-          v-model="name"
-          label="Your name"
-          @keyup.enter="emit('join', name)"
-        />
+        <q-input v-model="name" label="Your name" @keyup.enter="emit('join', name)" />
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn
-          label="Join Chat"
-          color="primary"
-          :disable="!name"
-          @click="emit('join', name)"
-        />
+        <q-btn label="Join Chat" color="primary" :disable="!name" @click="emit('join', name)" />
       </q-card-actions>
     </q-card>
   </div>
@@ -28,9 +19,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-const emit = defineEmits<{
-  (e: 'join', name: string): void;
-}>();
+const emit = defineEmits<{ (e: 'join', name: string): void }>();
 
 const name = ref('');
 </script>
