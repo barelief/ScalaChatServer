@@ -19,7 +19,7 @@ object WebSocketFlow extends Logging {
 
     val actorRef: ActorRef[ChatRoomActor.Response] = system.systemActorOf(
       JsonMessageAdapter.behavior(queue),
-      s"user-$name"
+      s"user-$name-${System.currentTimeMillis()}" // Unique identifier for each connection
     )
 
     responsePromise.success(actorRef)
@@ -27,6 +27,13 @@ object WebSocketFlow extends Logging {
     val outgoingMessages = Source.futureSource(responsePromise.future.map { actorRef =>
       // logger.info(s"User $name connected")
       chatRoom ! ChatRoomActor.Join(name, actorRef)
+
+      // Set up stream completion handling
+      publisher.watchTermination()((_, done) => {
+        done.foreach(_ => chatRoom ! ChatRoomActor.Leave(name, actorRef))
+        ()
+      })
+
       publisher
     })
 
