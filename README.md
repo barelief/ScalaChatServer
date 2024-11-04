@@ -78,6 +78,6 @@ Clone the repository.
 ### **Backend**
 
 - [ ] Write Comments!
-- [ ] Implement message persistence with a database.
+- [x] ~~Implement message persistence with a database.~~
 - [ ] Add user authentication.
-- [ ] Resolve duplicate user error on login.
+- [x] ~~Resolve duplicate user error on login.~~
