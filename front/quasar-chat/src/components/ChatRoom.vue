@@ -3,6 +3,7 @@
     <div class="col-12 col-md-9">
       <q-card class="chat-card">
         <q-card-section class="chat-messages" ref="messagesContainer">
+          <!-- Chat Bubble -->
           <q-chat-message
             v-for="(message, index) in props.messages"
             :key="index"
@@ -12,6 +13,7 @@
           />
         </q-card-section>
 
+        <!-- Chat input for sending messagesz -->
         <q-card-section>
           <q-form @submit.prevent="sendMessage">
             <div class="row q-gutter-sm">
@@ -48,11 +50,18 @@
     />
 
     <!-- MEMBERS Sidebar -->
-    <q-drawer v-model="sidebar" side="right" overlay>
+
+    <q-drawer
+      class="q-pb-10"
+      v-model="sidebar"
+      side="right"
+      overlay
+      @click.self="toggleSidebar"
+    >
       <q-card>
         <q-card-section>
           <div class="text-h6">Members</div>
-          <q-list dense>
+          <q-list>
             <q-item v-for="member in props.members" :key="member">
               <q-item-section>
                 <q-item-label>{{ member }}</q-item-label>
